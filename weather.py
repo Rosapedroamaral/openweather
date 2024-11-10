@@ -8,6 +8,16 @@ API_KEY = st.secrets["API_KEY"]
 BASE_URL_WEATHER = "https://api.openweathermap.org/data/2.5/weather"
 BASE_URL_AIR_QUALITY = "https://api.openweathermap.org/data/2.5/air_pollution"
 
+# Níveis recomendados de poluentes (valores fictícios para exemplo)
+RECOMMENDED_LEVELS = {
+    'pm2_5': 25,  # µg/m³
+    'pm10': 50,  # µg/m³
+    'no2': 40,  # µg/m³
+    'so2': 20,  # µg/m³
+    'o3': 100,  # µg/m³
+    'co': 10   # mg/m³ (Convertido para µg/m³ como exemplo)
+}
+
 # Função para obter dados meteorológicos
 def get_weather_data(city, country):
     params = {
@@ -63,7 +73,12 @@ def create_dashboard():
                 
                 components = air_quality_data['list'][0]['components']
                 components_df = pd.DataFrame(components.items(), columns=['Componente', 'Concentração'])
-                
+
+                # Verificar componentes acima dos níveis recomendados
+                for component, concentration in components.items():
+                    if component in RECOMMENDED_LEVELS and concentration > RECOMMENDED_LEVELS[component]:
+                        st.warning(f"Nível de {component.upper()} está acima do recomendado: {concentration} µg/m³ (Recomendado: {RECOMMENDED_LEVELS[component]} µg/m³)")
+
                 # Exibir gráfico de componentes do ar
                 st.subheader('Componentes da Qualidade do Ar')
                 air_quality_chart = alt.Chart(components_df).mark_bar().encode(
