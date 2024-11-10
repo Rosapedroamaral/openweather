@@ -37,6 +37,10 @@ def create_dashboard():
         else:
             st.write(f"**Cidade**: {forecast_data['city']['name']}")
 
+            # Exibir dados brutos para depuração
+            st.write("Dados Brutos de Previsão:")
+            st.write(forecast_data)
+
             # Processar dados de previsão
             forecast_list = forecast_data['list']
             forecast_df = pd.json_normalize(forecast_list)
