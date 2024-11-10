@@ -8,9 +8,9 @@ API_KEY = st.secrets["API_KEY"]
 BASE_URL = "https://api.openweathermap.org/data/2.5/weather"
 
 # Função para obter dados meteorológicos
-def get_weather_data(city):
+def get_weather_data(city, country):
     params = {
-        'q': city,
+        'q': f"{city},{country}",
         'appid': API_KEY,
         'units': 'metric',
         'lang': 'pt_br'
@@ -22,16 +22,18 @@ def get_weather_data(city):
 def create_dashboard():
     st.title('Dashboard de Tempo em Tempo Real')
 
-    # Adicionar entrada para cidade
+    # Adicionar entrada para cidade e país
     city = st.text_input("Digite o nome da cidade", "Rio de Janeiro")
+    country = st.text_input("Digite o código do país (ex: br, us, ca)", "br")
     
-    if city:
+    if city and country:
         # Remover espaços extras e capitalizar o nome da cidade
         city = city.strip().title()
-        weather_data = get_weather_data(city)
+        country = country.strip().lower()
+        weather_data = get_weather_data(city, country)
         
         if weather_data.get("cod") != 200:
-            st.error(f"Cidade '{city}' não encontrada. Tente outra cidade.")
+            st.error(f"Cidade '{city}' não encontrada no país '{country.upper()}'. Tente outra cidade ou país.")
         else:
             st.write(f"**Cidade**: {weather_data['name']}")
             st.write(f"**Temperatura**: {weather_data['main']['temp']} °C")
