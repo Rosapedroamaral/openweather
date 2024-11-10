@@ -41,7 +41,8 @@ def create_dashboard():
             forecast_list = forecast_data['list']
             forecast_df = pd.json_normalize(forecast_list)
             forecast_df['dt'] = pd.to_datetime(forecast_df['dt'], unit='s')
-            forecast_df = forecast_df[['dt', 'main.temp', 'main.temp_min', 'main.temp_max', 'weather[0].description']]
+            forecast_df['description'] = forecast_df['weather'].apply(lambda x: x[0]['description'] if isinstance(x, list) and len(x) > 0 else None)
+            forecast_df = forecast_df[['dt', 'main.temp', 'main.temp_min', 'main.temp_max', 'description']]
 
             # Exibir tabela de previsão
             st.subheader('Previsão para os próximos 5 dias')
@@ -52,7 +53,7 @@ def create_dashboard():
             temp_chart = alt.Chart(forecast_df).mark_line().encode(
                 x=alt.X('dt:T', title='Data'),
                 y=alt.Y('main.temp:Q', title='Temperatura (°C)'),
-                tooltip=['dt:T', 'main.temp:Q', 'weather[0].description']
+                tooltip=['dt:T', 'main.temp:Q', 'description']
             ).properties(width=600, height=400).interactive()
             st.altair_chart(temp_chart)
 
