@@ -15,7 +15,7 @@ RECOMMENDED_LEVELS = {
     'no2': 40,  # µg/m³
     'so2': 20,  # µg/m³
     'o3': 100,  # µg/m³
-    'co': 10   # mg/m³ (Convertido para µg/m³ como exemplo)
+    'co': 450  # ppm
 }
 
 # Função para obter dados meteorológicos
@@ -65,32 +65,3 @@ def create_dashboard():
             st.write(f"**Umidade**: {weather_data['main']['humidity']}%")
             st.write(f"**Pressão**: {weather_data['main']['pressure']} hPa")
             st.write(f"**Velocidade do Vento**: {weather_data['wind']['speed']} m/s")
-            st.write(f"**Descrição**: {weather_data['weather'][0]['description'].capitalize()}")
-
-            if air_quality_data:
-                air_quality_index = air_quality_data['list'][0]['main']['aqi']
-                st.write(f"**Qualidade do Ar**: {air_quality_index}")
-                
-                components = air_quality_data['list'][0]['components']
-                components_df = pd.DataFrame(components.items(), columns=['Componente', 'Concentração'])
-
-                # Verificar componentes acima dos níveis recomendados
-                for component, concentration in components.items():
-                    if component in RECOMMENDED_LEVELS and concentration > RECOMMENDED_LEVELS[component]:
-                        st.warning(f"Nível de {component.upper()} está acima do recomendado: {concentration} µg/m³ (Recomendado: {RECOMMENDED_LEVELS[component]} µg/m³)")
-
-                # Exibir gráfico de componentes do ar
-                st.subheader('Componentes da Qualidade do Ar')
-                air_quality_chart = alt.Chart(components_df).mark_bar().encode(
-                    x=alt.X('Componente:N'),
-                    y=alt.Y('Concentração:Q'),
-                    tooltip=['Componente', 'Concentração']
-                ).properties(width=600, height=400).interactive()
-                st.altair_chart(air_quality_chart)
-
-if __name__ == "__main__":
-    create_dashboard()
-
-    # Adiciona um botão para atualização manual
-    if st.button("Atualizar Dados"):
-        st.rerun()
