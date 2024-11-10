@@ -26,10 +26,12 @@ def create_dashboard():
     city = st.text_input("Digite o nome da cidade", "Rio de Janeiro")
     
     if city:
+        # Remover espaços extras e capitalizar o nome da cidade
+        city = city.strip().title()
         weather_data = get_weather_data(city)
         
         if weather_data.get("cod") != 200:
-            st.error("Cidade não encontrada. Tente outra cidade.")
+            st.error(f"Cidade '{city}' não encontrada. Tente outra cidade.")
         else:
             st.write(f"**Cidade**: {weather_data['name']}")
             st.write(f"**Temperatura**: {weather_data['main']['temp']} °C")
@@ -40,14 +42,14 @@ def create_dashboard():
 
             # Exibir gráfico de temperatura
             temp_df = pd.DataFrame({
-                'Metric': ['Temperatura', 'Umidade', 'Pressão', 'Velocidade do Vento'],
+                'Métrica': ['Temperatura', 'Umidade', 'Pressão', 'Velocidade do Vento'],
                 'Valor': [weather_data['main']['temp'], weather_data['main']['humidity'], weather_data['main']['pressure'], weather_data['wind']['speed']]
             })
 
             chart = alt.Chart(temp_df).mark_bar().encode(
-                x=alt.X('Metric:N'),
+                x=alt.X('Métrica:N'),
                 y=alt.Y('Valor:Q'),
-                color='Metric:N'
+                color='Métrica:N'
             ).properties(width=600, height=400).interactive()
 
             st.altair_chart(chart)
