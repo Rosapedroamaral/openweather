@@ -57,11 +57,18 @@ def display_forecast(city, country):
     if forecast_data.get("cod") != "200":
         st.error("Erro ao obter dados de previsão do tempo.")
     else:
-        st.subheader("Previsão do Tempo")
+        st.subheader("Previsão do Tempo para os Próximos Dias")
+
+        forecast_list = []
         for day in forecast_data['list']:
-            st.write(f"Data: {day['dt_txt']}")
-            st.write(f"Temperatura: {day['main']['temp']} °C")
-            st.write(f"Descrição: {day['weather'][0]['description'].capitalize()}")
+            forecast_list.append({
+                'Data': day['dt_txt'],
+                'Temperatura (°C)': day['main']['temp'],
+                'Descrição': day['weather'][0]['description'].capitalize()
+            })
+
+        forecast_df = pd.DataFrame(forecast_list)
+        st.table(forecast_df)
 
 # Função para criar a dashboard
 def create_dashboard():
