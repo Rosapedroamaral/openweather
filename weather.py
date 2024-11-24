@@ -2,15 +2,14 @@ import streamlit as st
 import requests
 import pandas as pd
 import altair as alt
-import folium
 from datetime import datetime
-from streamlit_folium import folium_static
 
 # Configurações da API do OpenWeather
 API_KEY = st.secrets["API_KEY"]
 BASE_URL_WEATHER = "https://api.openweathermap.org/data/2.5/weather"
 BASE_URL_FORECAST = "https://api.openweathermap.org/data/2.5/forecast"
 BASE_URL_AIR_QUALITY = "https://api.openweathermap.org/data/2.5/air_pollution"
+BASE_URL_ALERTS = "https://api.openweathermap.org/data/2.5/onecall"
 
 # Níveis recomendados de poluentes (valores fictícios para exemplo)
 RECOMMENDED_LEVELS = {
@@ -54,6 +53,19 @@ def get_air_quality_data(lat, lon):
     response = requests.get(BASE_URL_AIR_QUALITY, params=params)
     return response.json()
 
+# Função para obter alertas meteorológicos
+def get_alerts(lat, lon):
+    params = {
+        'lat': lat,
+        'lon': lon,
+        'appid': API_KEY,
+        'exclude': 'minutely,hourly,daily',
+        'units': 'metric',
+        'lang': 'pt_br'
+    }
+    response = requests.get(BASE_URL_ALERTS, params=params)
+    return response.json()
+
 # Função para exibir a previsão do tempo
 def display_forecast(city, country, date):
     forecast_data = get_forecast_data(city, country)
@@ -77,29 +89,18 @@ def display_forecast(city, country, date):
             forecast_df = pd.DataFrame(forecast_list)
             st.table(forecast_df)
 
-# Função para exibir dados meteorológicos de forma estruturada
-def display_current_weather(weather_data, air_quality_index):
-    st.subheader(f"Condições Climáticas Atuais em {weather_data['name']}")
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.write(f"**Temperatura**: {weather_data['main']['temp']} °C")
-        st.write(f"**Umidade**: {weather_data['main']['humidity']}%")
-        st.write(f"**Pressão**: {weather_data['main']['pressure']} hPa")
-    
-    with col2:
-        st.write(f"**Velocidade do Vento**: {weather_data['wind']['speed']} m/s")
-        st.write(f"**Descrição**: {weather_data['weather'][0]['description'].capitalize()}")
-        st.write(f"**Qualidade do Ar**: {air_quality_index}")
-
-# Função para exibir o mapa interativo
-def display_map(lat, lon, air_quality_index):
-    st.subheader("Mapa Interativo")
-    m = folium.Map(location=[lat, lon], zoom_start=12)
-    folium.Marker([lat, lon], 
-                  tooltip='Localização Atual', 
-                  popup=f"Qualidade do Ar: {air_quality_index}").add_to(m)
-    folium_static(m)
+# Função para exibir alertas meteorológicos
+def display_alerts(lat, lon):
+    alerts_data = get_alerts(lat, lon)
+    if 'alerts' in alerts_data:
+        st.subheader("Alertas Meteorológicos")
+        for alert in alerts_data['alerts']:
+            st.write(f"**{alert['event']}**")
+            st.write(alert['description'])
+            st.write(f"Início: {datetime.fromtimestamp(alert['start']).strftime('%d-%m-%Y %H:%M')}")
+            st.write(f"Término: {datetime.fromtimestamp(alert['end']).strftime('%d-%m-%Y %H:%M')}")
+    else:
+        st.write("Sem alertas meteorológicos no momento.")
 
 # Função para criar a dashboard
 def create_dashboard():
@@ -122,11 +123,16 @@ def create_dashboard():
             lon = weather_data['coord']['lon']
             air_quality_data = get_air_quality_data(lat, lon)
             
+            st.write(f"**Cidade**: {weather_data['name']}")
+            st.write(f"**Temperatura**: {weather_data['main']['temp']} °C")
+            st.write(f"**Umidade**: {weather_data['main']['humidity']}%")
+            st.write(f"**Pressão**: {weather_data['main']['pressure']} hPa")
+            st.write(f"**Velocidade do Vento**: {weather_data['wind']['speed']} m/s")
+            st.write(f"**Descrição**: {weather_data['weather'][0]['description'].capitalize()}")
+
             if air_quality_data:
                 air_quality_index = air_quality_data['list'][0]['main']['aqi']
-                
-                # Exibir condições climáticas atuais
-                display_current_weather(weather_data, air_quality_index)
+                st.write(f"**Qualidade do Ar**: {air_quality_index}")
                 
                 components = air_quality_data['list'][0]['components']
                 components_df = pd.DataFrame(components.items(), columns=['Componente', 'Concentração'])
@@ -149,9 +155,6 @@ def create_dashboard():
                     tooltip=['Componente', 'Concentração']
                 ).properties(width=600, height=400).interactive()
                 st.altair_chart(air_quality_chart)
-                
-                # Exibir mapa interativo
-                display_map(lat, lon, air_quality_index)
             
             # Adicionar seleção de data
             date = st.date_input("Selecione uma data para a previsão", datetime.today())
@@ -159,6 +162,8 @@ def create_dashboard():
             
             # Exibir previsão do tempo para a data selecionada
             display_forecast(city, country, date_str)
+            # Exibir alertas meteorológicos
+            display_alerts(lat, lon)
 
 if __name__ == "__main__":
     create_dashboard()
