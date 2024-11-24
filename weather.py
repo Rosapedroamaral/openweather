@@ -2,7 +2,9 @@ import streamlit as st
 import requests
 import pandas as pd
 import altair as alt
+import folium
 from datetime import datetime
+from streamlit_folium import folium_static
 
 # Configurações da API do OpenWeather
 API_KEY = st.secrets["API_KEY"]
@@ -90,6 +92,15 @@ def display_current_weather(weather_data, air_quality_index):
         st.write(f"**Descrição**: {weather_data['weather'][0]['description'].capitalize()}")
         st.write(f"**Qualidade do Ar**: {air_quality_index}")
 
+# Função para exibir o mapa interativo
+def display_map(lat, lon, air_quality_index):
+    st.subheader("Mapa Interativo")
+    m = folium.Map(location=[lat, lon], zoom_start=12)
+    folium.Marker([lat, lon], 
+                  tooltip='Localização Atual', 
+                  popup=f"Qualidade do Ar: {air_quality_index}").add_to(m)
+    folium_static(m)
+
 # Função para criar a dashboard
 def create_dashboard():
     st.title('Dashboard de Saúde e Clima')
@@ -138,6 +149,9 @@ def create_dashboard():
                     tooltip=['Componente', 'Concentração']
                 ).properties(width=600, height=400).interactive()
                 st.altair_chart(air_quality_chart)
+                
+                # Exibir mapa interativo
+                display_map(lat, lon, air_quality_index)
             
             # Adicionar seleção de data
             date = st.date_input("Selecione uma data para a previsão", datetime.today())
