@@ -1,4 +1,5 @@
 import streamlit as st
+from pages import other_page
 import requests
 import pandas as pd
 import altair as alt
@@ -22,7 +23,6 @@ RECOMMENDED_LEVELS = {
     'co': 450  # ppm
 }
 
-# Função para obter dados meteorológicos
 def get_weather_data(city, country):
     params = {
         'q': f"{city},{country}",
@@ -33,7 +33,6 @@ def get_weather_data(city, country):
     response = requests.get(BASE_URL_WEATHER, params=params)
     return response.json()
 
-# Função para obter previsão do tempo
 def get_forecast_data(city, country):
     params = {
         'q': f"{city},{country}",
@@ -44,7 +43,6 @@ def get_forecast_data(city, country):
     response = requests.get(BASE_URL_FORECAST, params=params)
     return response.json()
 
-# Função para obter dados de qualidade do ar
 def get_air_quality_data(lat, lon):
     params = {
         'lat': lat,
@@ -54,7 +52,6 @@ def get_air_quality_data(lat, lon):
     response = requests.get(BASE_URL_AIR_QUALITY, params=params)
     return response.json()
 
-# Função para obter alertas meteorológicos
 def get_alerts(lat, lon):
     params = {
         'lat': lat,
@@ -67,7 +64,6 @@ def get_alerts(lat, lon):
     response = requests.get(BASE_URL_ALERTS, params=params)
     return response.json()
 
-# Função para obter índice UV
 def get_uv_index(lat, lon):
     params = {
         'lat': lat,
@@ -77,7 +73,6 @@ def get_uv_index(lat, lon):
     response = requests.get(BASE_URL_UV, params=params)
     return response.json()
 
-# Função para exibir a previsão do tempo
 def display_forecast(city, country, date):
     forecast_data = get_forecast_data(city, country)
     if forecast_data.get("cod") != "200":
@@ -100,7 +95,6 @@ def display_forecast(city, country, date):
             forecast_df = pd.DataFrame(forecast_list)
             st.table(forecast_df)
 
-# Função para exibir alertas meteorológicos
 def display_alerts(lat, lon):
     alerts_data = get_alerts(lat, lon)
     if 'alerts' in alerts_data:
@@ -113,7 +107,6 @@ def display_alerts(lat, lon):
     else:
         st.write("Sem alertas meteorológicos no momento.")
 
-# Função para exibir índice UV
 def display_uv_index(lat, lon):
     uv_data = get_uv_index(lat, lon)
     if uv_data:
@@ -121,16 +114,13 @@ def display_uv_index(lat, lon):
     else:
         return None
 
-# Função para criar a dashboard
-def create_dashboard():
+def main_dashboard():
     st.title('Dashboard de Saúde e Clima')
 
-    # Adicionar entrada para cidade e país
     city = st.text_input("Digite o nome da cidade", "Rio de Janeiro")
     country = st.text_input("Digite o código do país (ex: br, us, ca)", "br")
     
     if city and country:
-        # Remover espaços extras e capitalizar o nome da cidade
         city = city.strip().title()
         country = country.strip().lower()
         weather_data = get_weather_data(city, country)
@@ -165,17 +155,14 @@ def create_dashboard():
                 components = air_quality_data['list'][0]['components']
                 components_df = pd.DataFrame(components.items(), columns=['Componente', 'Concentração'])
 
-                # Verificar componentes acima dos níveis recomendados
                 for component, concentration in components.items():
-                    # Considerar ppm para CO e ajustar valores de referência
                     if component == 'co':
-                        concentration_ppm = concentration / 1000  # Converter µg/m³ para ppm
+                        concentration_ppm = concentration / 1000
                         if concentration_ppm > RECOMMENDED_LEVELS[component]:
                             st.warning(f"Nível de {component.upper()} está acima do recomendado: {concentration_ppm} ppm (Recomendado: {RECOMMENDED_LEVELS[component]} ppm)")
                     elif component in RECOMMENDED_LEVELS and concentration > RECOMMENDED_LEVELS[component]:
                         st.warning(f"Nível de {component.upper()} está acima do recomendado: {concentration} µg/m³ (Recomendado: {RECOMMENDED_LEVELS[component]} µg/m³)")
 
-                # Exibir gráfico de componentes do ar
                 st.subheader('Componentes da Qualidade do Ar')
                 air_quality_chart = alt.Chart(components_df).mark_bar().encode(
                     x=alt.X('Componente:N'),
@@ -184,18 +171,21 @@ def create_dashboard():
                 ).properties(width=600, height=400).interactive()
                 st.altair_chart(air_quality_chart)
             
-            # Adicionar seleção de data
             date = st.date_input("Selecione uma data para a previsão", datetime.today())
             date_str = date.strftime("%Y-%m-%d")
             
-            # Exibir previsão do tempo para a data selecionada
             display_forecast(city, country, date_str)
-            # Exibir alertas meteorológicos
             display_alerts(lat, lon)
 
-if __name__ == "__main__":
-    create_dashboard()
+def main():
+    menu = st.sidebar.selectbox('Menu', ['Dashboard', 'Outra Página'])
 
-    # Adiciona um botão para atualização manual
+    if menu == 'Dashboard':
+        main_dashboard()
+    elif menu == 'Outra Página':
+        other_page.main()
+
+if __name__ == "__main__":
+    main()
     if st.button("Atualizar Dados"):
         st.rerun()
