@@ -155,14 +155,7 @@ def create_dashboard():
                 st.write(f"**Descrição:** {weather_data['weather'][0]['description'].capitalize()}")
                 st.write(f"**Índice UV:** {uv_index}")
                 if uv_index and uv_index > 11:
-                    st.markdown(
-                        """
-                        <div style="padding: 10px; background-color: yellow; border-radius: 5px;">
-                            <strong>Índice UV está extremamente alto! Proteja-se do sol.</strong>
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
+                    st.warning("**Índice UV está extremamente alto! Proteja-se do sol.**")
                 if air_quality_data:
                     st.write(f"**Qualidade do Ar:** {air_quality_data['list'][0]['main']['aqi']}")
                 else:
