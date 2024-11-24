@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 import pandas as pd
 import altair as alt
+from datetime import datetime
 
 # Configurações da API do OpenWeather
 API_KEY = st.secrets["API_KEY"]
@@ -52,23 +53,27 @@ def get_air_quality_data(lat, lon):
     return response.json()
 
 # Função para exibir a previsão do tempo
-def display_forecast(city, country):
+def display_forecast(city, country, date):
     forecast_data = get_forecast_data(city, country)
     if forecast_data.get("cod") != "200":
         st.error("Erro ao obter dados de previsão do tempo.")
     else:
-        st.subheader("Previsão do Tempo para os Próximos Dias")
+        st.subheader(f"Previsão do Tempo para {date}")
 
         forecast_list = []
         for day in forecast_data['list']:
-            forecast_list.append({
-                'Data': day['dt_txt'],
-                'Temperatura (°C)': day['main']['temp'],
-                'Descrição': day['weather'][0]['description'].capitalize()
-            })
+            if day['dt_txt'].startswith(date):
+                forecast_list.append({
+                    'Data': day['dt_txt'],
+                    'Temperatura (°C)': day['main']['temp'],
+                    'Descrição': day['weather'][0]['description'].capitalize()
+                })
 
-        forecast_df = pd.DataFrame(forecast_list)
-        st.table(forecast_df)
+        if not forecast_list:
+            st.warning("Nenhuma previsão encontrada para a data especificada.")
+        else:
+            forecast_df = pd.DataFrame(forecast_list)
+            st.table(forecast_df)
 
 # Função para criar a dashboard
 def create_dashboard():
@@ -124,8 +129,12 @@ def create_dashboard():
                 ).properties(width=600, height=400).interactive()
                 st.altair_chart(air_quality_chart)
             
-            # Exibir previsão do tempo
-            display_forecast(city, country)
+            # Adicionar seleção de data
+            date = st.date_input("Selecione uma data para a previsão", datetime.today())
+            date_str = date.strftime("%Y-%m-%d")
+            
+            # Exibir previsão do tempo para a data selecionada
+            display_forecast(city, country, date_str)
 
 if __name__ == "__main__":
     create_dashboard()
