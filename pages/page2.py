@@ -1,12 +1,14 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
+from datetime import datetime
 
-def load_data():
-    # Exemplo de dados de temperatura média diária ao longo de um ano
+def load_data(start_date, end_date):
+    # Exemplo de dados de temperatura máxima diária no intervalo fornecido
+    date_range = pd.date_range(start=start_date, end=end_date)
     data = {
-        'Data': pd.date_range(start='2023-01-01', periods=365, freq='D'),
-        'Temperatura (°C)': [20 + (i % 10) for i in range(365)]  # Dados fictícios
+        'Data': date_range,
+        'Temperatura Máxima (°C)': [20 + (i % 10) for i in range(len(date_range))]  # Dados fictícios
     }
     df = pd.DataFrame(data)
     return df
@@ -15,30 +17,37 @@ def main():
     st.title('Page 2')
     st.subheader('Padrões Climáticos Históricos')
 
-    # Carregar dados
-    df = load_data()
+    # Perguntar ao usuário a data inicial e a data final
+    start_date = st.date_input("Selecione a data inicial", datetime(2023, 1, 1))
+    end_date = st.date_input("Selecione a data final", datetime(2023, 12, 31))
 
-    # Exibir tabela de dados
-    st.write(df)
+    if start_date > end_date:
+        st.error("A data inicial não pode ser posterior à data final.")
+    else:
+        # Carregar dados
+        df = load_data(start_date, end_date)
 
-    # Criar gráfico interativo
-    chart = alt.Chart(df).mark_line().encode(
-        x='Data',
-        y='Temperatura (°C)',
-        tooltip=['Data', 'Temperatura (°C)']
-    ).properties(
-        width=800,
-        height=400
-    ).interactive()
+        # Exibir tabela de dados
+        st.write(df)
 
-    st.altair_chart(chart)
+        # Criar gráfico interativo
+        chart = alt.Chart(df).mark_line().encode(
+            x='Data',
+            y='Temperatura Máxima (°C)',
+            tooltip=['Data', 'Temperatura Máxima (°C)']
+        ).properties(
+            width=800,
+            height=400
+        ).interactive()
 
-    # Informações adicionais
-    st.subheader('Informações Adicionais')
-    st.write("""
-        Este gráfico mostra a temperatura média diária ao longo de um ano.
-        Você pode interagir com o gráfico para ver detalhes específicos de cada dia.
-    """)
+        st.altair_chart(chart)
+
+        # Informações adicionais
+        st.subheader('Informações Adicionais')
+        st.write("""
+            Este gráfico mostra a temperatura máxima diária ao longo do intervalo selecionado.
+            Você pode interagir com o gráfico para ver detalhes específicos de cada dia.
+        """)
 
 if __name__ == "__main__":
     main()
