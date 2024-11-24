@@ -75,6 +75,15 @@ def display_forecast(city, country, date):
             forecast_df = pd.DataFrame(forecast_list)
             st.table(forecast_df)
 
+# Função para exibir dados meteorológicos de forma estruturada
+def display_current_weather(weather_data):
+    st.subheader(f"Condições Climáticas Atuais em {weather_data['name']}")
+    st.write(f"**Temperatura**: {weather_data['main']['temp']} °C")
+    st.write(f"**Umidade**: {weather_data['main']['humidity']}%")
+    st.write(f"**Pressão**: {weather_data['main']['pressure']} hPa")
+    st.write(f"**Velocidade do Vento**: {weather_data['wind']['speed']} m/s")
+    st.write(f"**Descrição**: {weather_data['weather'][0]['description'].capitalize()}")
+
 # Função para criar a dashboard
 def create_dashboard():
     st.title('Dashboard de Saúde e Clima')
@@ -96,12 +105,8 @@ def create_dashboard():
             lon = weather_data['coord']['lon']
             air_quality_data = get_air_quality_data(lat, lon)
             
-            st.write(f"**Cidade**: {weather_data['name']}")
-            st.write(f"**Temperatura**: {weather_data['main']['temp']} °C")
-            st.write(f"**Umidade**: {weather_data['main']['humidity']}%")
-            st.write(f"**Pressão**: {weather_data['main']['pressure']} hPa")
-            st.write(f"**Velocidade do Vento**: {weather_data['wind']['speed']} m/s")
-            st.write(f"**Descrição**: {weather_data['weather'][0]['description'].capitalize()}")
+            # Exibir condições climáticas atuais
+            display_current_weather(weather_data)
 
             if air_quality_data:
                 air_quality_index = air_quality_data['list'][0]['main']['aqi']
