@@ -1,5 +1,4 @@
 import streamlit as st
-from pages import page2
 import requests
 import pandas as pd
 import altair as alt
@@ -73,47 +72,6 @@ def get_uv_index(lat, lon):
     response = requests.get(BASE_URL_UV, params=params)
     return response.json()
 
-def display_forecast(city, country, date):
-    forecast_data = get_forecast_data(city, country)
-    if forecast_data.get("cod") != "200":
-        st.error("Erro ao obter dados de previsão do tempo.")
-    else:
-        st.subheader(f"Previsão do Tempo para {date}")
-
-        forecast_list = []
-        for day in forecast_data['list']:
-            if day['dt_txt'].startswith(date):
-                forecast_list.append({
-                    'Data': day['dt_txt'],
-                    'Temperatura (°C)': day['main']['temp'],
-                    'Descrição': day['weather'][0]['description'].capitalize()
-                })
-
-        if not forecast_list:
-            st.warning("Nenhuma previsão encontrada para a data especificada.")
-        else:
-            forecast_df = pd.DataFrame(forecast_list)
-            st.table(forecast_df)
-
-def display_alerts(lat, lon):
-    alerts_data = get_alerts(lat, lon)
-    if 'alerts' in alerts_data:
-        st.subheader("Alertas Meteorológicos")
-        for alert in alerts_data['alerts']:
-            st.write(f"**{alert['event']}**")
-            st.write(alert['description'])
-            st.write(f"Início: {datetime.fromtimestamp(alert['start']).strftime('%d-%m-%Y %H:%M')}")
-            st.write(f"Término: {datetime.fromtimestamp(alert['end']).strftime('%d-%m-%Y %H:%M')}")
-    else:
-        st.write("Sem alertas meteorológicos no momento.")
-
-def display_uv_index(lat, lon):
-    uv_data = get_uv_index(lat, lon)
-    if uv_data:
-        return uv_data['value']
-    else:
-        return None
-
 def main_dashboard():
     st.title('Dashboard de Saúde e Clima')
 
@@ -131,7 +89,7 @@ def main_dashboard():
             lat = weather_data['coord']['lat']
             lon = weather_data['coord']['lon']
             air_quality_data = get_air_quality_data(lat, lon)
-            uv_index = display_uv_index(lat, lon)
+            uv_index = get_uv_index(lat, lon)['value'] if get_uv_index(lat, lon) else None
             
             st.subheader(f"**Dados do clima atual para {city}**")
             col1, col2 = st.columns(2)
@@ -178,13 +136,7 @@ def main_dashboard():
             display_alerts(lat, lon)
 
 def main():
-    st.sidebar.title('Menu')
-    selection = st.sidebar.radio('Navegação', ['Dashboard', 'Page 2'])
-
-    if selection == 'Dashboard':
-        main_dashboard()
-    elif selection == 'Page 2':
-        page2.main()
+    main_dashboard()
 
 if __name__ == "__main__":
     main()
