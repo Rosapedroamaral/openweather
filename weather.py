@@ -117,8 +117,9 @@ def display_alerts(lat, lon):
 def display_uv_index(lat, lon):
     uv_data = get_uv_index(lat, lon)
     if uv_data:
-        uv_index = uv_data['value']
-        st.write(f"**Índice UV**: {uv_index}")
+        return uv_data['value']
+    else:
+        return None
 
 # Função para criar a dashboard
 def create_dashboard():
@@ -140,6 +141,7 @@ def create_dashboard():
             lat = weather_data['coord']['lat']
             lon = weather_data['coord']['lon']
             air_quality_data = get_air_quality_data(lat, lon)
+            uv_index = display_uv_index(lat, lon)
             
             st.write(f"**Cidade**: {weather_data['name']}")
             st.write(f"**Temperatura**: {weather_data['main']['temp']} °C")
@@ -147,6 +149,8 @@ def create_dashboard():
             st.write(f"**Pressão**: {weather_data['main']['pressure']} hPa")
             st.write(f"**Velocidade do Vento**: {weather_data['wind']['speed']} m/s")
             st.write(f"**Descrição**: {weather_data['weather'][0]['description'].capitalize()}")
+            if uv_index is not None:
+                st.write(f"**Índice UV**: {uv_index}")
 
             if air_quality_data:
                 air_quality_index = air_quality_data['list'][0]['main']['aqi']
@@ -182,8 +186,6 @@ def create_dashboard():
             display_forecast(city, country, date_str)
             # Exibir alertas meteorológicos
             display_alerts(lat, lon)
-            # Exibir índice UV
-            display_uv_index(lat, lon)
 
 if __name__ == "__main__":
     create_dashboard()
