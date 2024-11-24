@@ -143,19 +143,18 @@ def create_dashboard():
             air_quality_data = get_air_quality_data(lat, lon)
             uv_index = display_uv_index(lat, lon)
             
-            st.write(f"**Cidade**: {weather_data['name']}")
-            st.write(f"**Temperatura**: {weather_data['main']['temp']} °C")
-            st.write(f"**Umidade**: {weather_data['main']['humidity']}%")
-            st.write(f"**Pressão**: {weather_data['main']['pressure']} hPa")
-            st.write(f"**Velocidade do Vento**: {weather_data['wind']['speed']} m/s")
-            st.write(f"**Descrição**: {weather_data['weather'][0]['description'].capitalize()}")
-            if uv_index is not None:
-                st.write(f"**Índice UV**: {uv_index}")
-
+            st.subheader(f"**Clima Atual em {weather_data['name']}**")
+            st.write(f"""
+                **Temperatura**: {weather_data['main']['temp']} °C  
+                **Umidade**: {weather_data['main']['humidity']}%  
+                **Pressão**: {weather_data['main']['pressure']} hPa  
+                **Velocidade do Vento**: {weather_data['wind']['speed']} m/s  
+                **Descrição**: {weather_data['weather'][0]['description'].capitalize()}  
+                **Índice UV**: {uv_index}  
+                **Qualidade do Ar**: {air_quality_data['list'][0]['main']['aqi'] if air_quality_data else 'N/A'}
+            """)
+            
             if air_quality_data:
-                air_quality_index = air_quality_data['list'][0]['main']['aqi']
-                st.write(f"**Qualidade do Ar**: {air_quality_index}")
-                
                 components = air_quality_data['list'][0]['components']
                 components_df = pd.DataFrame(components.items(), columns=['Componente', 'Concentração'])
 
