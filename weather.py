@@ -154,6 +154,8 @@ def create_dashboard():
             with col2:
                 st.write(f"**Descrição:** {weather_data['weather'][0]['description'].capitalize()}")
                 st.write(f"**Índice UV:** {uv_index}")
+                if uv_index and uv_index > 11:
+                    st.warning("**Índice UV está extremamente alto! Proteja-se do sol.**")
                 if air_quality_data:
                     st.write(f"**Qualidade do Ar:** {air_quality_data['list'][0]['main']['aqi']}")
                 else:
