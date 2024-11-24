@@ -6,7 +6,7 @@ import altair as alt
 # Configurações da API do OpenWeather
 API_KEY = st.secrets["API_KEY"]
 BASE_URL_WEATHER = "https://api.openweathermap.org/data/2.5/weather"
-BASE_URL_FORECAST = "https://api.openweathermap.org/data/2.5/onecall"
+BASE_URL_FORECAST = "https://api.openweathermap.org/data/2.5/forecast"
 BASE_URL_AIR_QUALITY = "https://api.openweathermap.org/data/2.5/air_pollution"
 
 # Níveis recomendados de poluentes (valores fictícios para exemplo)
@@ -30,14 +30,13 @@ def get_weather_data(city, country):
     response = requests.get(BASE_URL_WEATHER, params=params)
     return response.json()
 
-# Função para obter dados de previsão do tempo
-def get_weather_forecast(lat, lon):
+# Função para obter previsão do tempo
+def get_forecast_data(city, country):
     params = {
-        'lat': lat,
-        'lon': lon,
-        'exclude': 'current,minutely,hourly,alerts',
+        'q': f"{city},{country}",
+        'appid': API_KEY,
         'units': 'metric',
-        'appid': API_KEY
+        'lang': 'pt_br'
     }
     response = requests.get(BASE_URL_FORECAST, params=params)
     return response.json()
@@ -51,6 +50,18 @@ def get_air_quality_data(lat, lon):
     }
     response = requests.get(BASE_URL_AIR_QUALITY, params=params)
     return response.json()
+
+# Função para exibir a previsão do tempo
+def display_forecast(city, country):
+    forecast_data = get_forecast_data(city, country)
+    if forecast_data.get("cod") != "200":
+        st.error("Erro ao obter dados de previsão do tempo.")
+    else:
+        st.subheader("Previsão do Tempo")
+        for day in forecast_data['list']:
+            st.write(f"Data: {day['dt_txt']}")
+            st.write(f"Temperatura: {day['main']['temp']} °C")
+            st.write(f"Descrição: {day['weather'][0]['description'].capitalize()}")
 
 # Função para criar a dashboard
 def create_dashboard():
@@ -72,7 +83,6 @@ def create_dashboard():
             lat = weather_data['coord']['lat']
             lon = weather_data['coord']['lon']
             air_quality_data = get_air_quality_data(lat, lon)
-            weather_forecast_data = get_weather_forecast(lat, lon)
             
             st.write(f"**Cidade**: {weather_data['name']}")
             st.write(f"**Temperatura**: {weather_data['main']['temp']} °C")
@@ -106,32 +116,9 @@ def create_dashboard():
                     tooltip=['Componente', 'Concentração']
                 ).properties(width=600, height=400).interactive()
                 st.altair_chart(air_quality_chart)
-
-            if 'daily' in weather_forecast_data:
-                # Extrair dados de previsão do tempo
-                forecast_dates = []
-                forecast_temps = []
-                for day in weather_forecast_data['daily']:
-                    forecast_dates.append(pd.to_datetime(day['dt'], unit='s'))
-                    forecast_temps.append(day['temp']['day'])
-
-                forecast_df = pd.DataFrame({
-                    'Data': forecast_dates,
-                    'Temperatura (°C)': forecast_temps
-                })
-
-                # Exibir gráfico de previsão do tempo
-                st.subheader('Previsão do Tempo para os Próximos Dias')
-                weather_forecast_chart = alt.Chart(forecast_df).mark_line(point=True).encode(
-                    x=alt.X('Data:T', title='Data'),
-                    y=alt.Y('Temperatura (°C):Q', title='Temperatura (°C)'),
-                    tooltip=['Data', 'Temperatura (°C)']
-                ).properties(width=600, height=400).interactive()
-                st.altair_chart(weather_forecast_chart)
-            else:
-                st.warning("Dados de previsão do tempo não disponíveis.")
-                # Exibir a resposta completa da API para depuração
-                st.json(weather_forecast_data)
+            
+            # Exibir previsão do tempo
+            display_forecast(city, country)
 
 if __name__ == "__main__":
     create_dashboard()
