@@ -72,54 +72,19 @@ def get_uv_index(lat, lon):
     response = requests.get(BASE_URL_UV, params=params)
     return response.json()
 
-def display_forecast(city, country, date):
-    forecast_data = get_forecast_data(city, country)
-    if forecast_data.get("cod") != "200":
-        st.error("Erro ao obter dados de previsão do tempo.")
-    else:
-        st.subheader(f"Previsão do Tempo para {date}")
-
-        forecast_list = []
-        for day in forecast_data['list']:
-            if day['dt_txt'].startswith(date):
-                forecast_list.append({
-                    'Data': day['dt_txt'],
-                    'Temperatura (°C)': day['main']['temp'],
-                    'Descrição': day['weather'][0]['description'].capitalize()
-                })
-
-        if not forecast_list:
-            st.warning("Nenhuma previsão encontrada para a data especificada.")
-        else:
-            forecast_df = pd.DataFrame(forecast_list)
-            st.table(forecast_df)
-
-def display_alerts(lat, lon):
-    alerts_data = get_alerts(lat, lon)
-    if 'alerts' in alerts_data:
-        st.subheader("Alertas Meteorológicos")
-        for alert in alerts_data['alerts']:
-            st.write(f"**{alert['event']}**")
-            st.write(alert['description'])
-            st.write(f"Início: {datetime.fromtimestamp(alert['start']).strftime('%d-%m-%Y %H:%M')}")
-            st.write(f"Término: {datetime.fromtimestamp(alert['end']).strftime('%d-%m-%Y %H:%M')}")
-    else:
-        st.write("Sem alertas meteorológicos no momento.")
-
-def display_uv_index(lat, lon):
-    uv_data = get_uv_index(lat, lon)
-    if uv_data:
-        return uv_data['value']
-    else:
-        return None
-
 def create_dashboard():
     st.title('Dashboard de Saúde e Clima')
 
+    # Adicionar entrada para cidade e país
     city = st.text_input("Digite o nome da cidade", "Rio de Janeiro")
     country = st.text_input("Digite o código do país (ex: br, us, ca)", "br")
     
     if city and country:
+        # Armazenar a cidade e país em session_state
+        st.session_state['city'] = city
+        st.session_state['country'] = country
+
+        # Remover espaços extras e capitalizar o nome da cidade
         city = city.strip().title()
         country = country.strip().lower()
         weather_data = get_weather_data(city, country)
@@ -154,14 +119,17 @@ def create_dashboard():
                 components = air_quality_data['list'][0]['components']
                 components_df = pd.DataFrame(components.items(), columns=['Componente', 'Concentração'])
 
+                # Verificar componentes acima dos níveis recomendados
                 for component, concentration in components.items():
+                    # Considerar ppm para CO e ajustar valores de referência
                     if component == 'co':
-                        concentration_ppm = concentration / 1000
+                        concentration_ppm = concentration / 1000  # Converter µg/m³ para ppm
                         if concentration_ppm > RECOMMENDED_LEVELS[component]:
                             st.warning(f"Nível de {component.upper()} está acima do recomendado: {concentration_ppm} ppm (Recomendado: {RECOMMENDED_LEVELS[component]} ppm)")
                     elif component in RECOMMENDED_LEVELS and concentration > RECOMMENDED_LEVELS[component]:
                         st.warning(f"Nível de {component.upper()} está acima do recomendado: {concentration} µg/m³ (Recomendado: {RECOMMENDED_LEVELS[component]} µg/m³)")
 
+                # Exibir gráfico de componentes do ar
                 st.subheader('Componentes da Qualidade do Ar')
                 air_quality_chart = alt.Chart(components_df).mark_bar().encode(
                     x=alt.X('Componente:N'),
@@ -170,14 +138,18 @@ def create_dashboard():
                 ).properties(width=600, height=400).interactive()
                 st.altair_chart(air_quality_chart)
             
+            # Adicionar seleção de data
             date = st.date_input("Selecione uma data para a previsão", datetime.today())
             date_str = date.strftime("%Y-%m-%d")
             
+            # Exibir previsão do tempo para a data selecionada
             display_forecast(city, country, date_str)
+            # Exibir alertas meteorológicos
             display_alerts(lat, lon)
 
 if __name__ == "__main__":
     create_dashboard()
 
+    # Adiciona um botão para atualização manual
     if st.button("Atualizar Dados"):
         st.rerun()
