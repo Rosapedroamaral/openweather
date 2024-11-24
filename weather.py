@@ -22,6 +22,7 @@ RECOMMENDED_LEVELS = {
     'co': 450  # ppm
 }
 
+# Função para obter dados meteorológicos
 def get_weather_data(city, country):
     params = {
         'q': f"{city},{country}",
@@ -32,6 +33,7 @@ def get_weather_data(city, country):
     response = requests.get(BASE_URL_WEATHER, params=params)
     return response.json()
 
+# Função para obter previsão do tempo
 def get_forecast_data(city, country):
     params = {
         'q': f"{city},{country}",
@@ -42,6 +44,7 @@ def get_forecast_data(city, country):
     response = requests.get(BASE_URL_FORECAST, params=params)
     return response.json()
 
+# Função para obter dados de qualidade do ar
 def get_air_quality_data(lat, lon):
     params = {
         'lat': lat,
@@ -51,6 +54,7 @@ def get_air_quality_data(lat, lon):
     response = requests.get(BASE_URL_AIR_QUALITY, params=params)
     return response.json()
 
+# Função para obter alertas meteorológicos
 def get_alerts(lat, lon):
     params = {
         'lat': lat,
@@ -63,6 +67,7 @@ def get_alerts(lat, lon):
     response = requests.get(BASE_URL_ALERTS, params=params)
     return response.json()
 
+# Função para obter índice UV
 def get_uv_index(lat, lon):
     params = {
         'lat': lat,
@@ -72,6 +77,51 @@ def get_uv_index(lat, lon):
     response = requests.get(BASE_URL_UV, params=params)
     return response.json()
 
+# Função para exibir a previsão do tempo
+def display_forecast(city, country, date):
+    forecast_data = get_forecast_data(city, country)
+    if forecast_data.get("cod") != "200":
+        st.error("Erro ao obter dados de previsão do tempo.")
+    else:
+        st.subheader(f"Previsão do Tempo para {date}")
+
+        forecast_list = []
+        for day in forecast_data['list']:
+            if day['dt_txt'].startswith(date):
+                forecast_list.append({
+                    'Data': day['dt_txt'],
+                    'Temperatura (°C)': day['main']['temp'],
+                    'Descrição': day['weather'][0]['description'].capitalize()
+                })
+
+        if not forecast_list:
+            st.warning("Nenhuma previsão encontrada para a data especificada.")
+        else:
+            forecast_df = pd.DataFrame(forecast_list)
+            st.table(forecast_df)
+
+# Função para exibir alertas meteorológicos
+def display_alerts(lat, lon):
+    alerts_data = get_alerts(lat, lon)
+    if 'alerts' in alerts_data:
+        st.subheader("Alertas Meteorológicos")
+        for alert in alerts_data['alerts']:
+            st.write(f"**{alert['event']}**")
+            st.write(alert['description'])
+            st.write(f"Início: {datetime.fromtimestamp(alert['start']).strftime('%d-%m-%Y %H:%M')}")
+            st.write(f"Término: {datetime.fromtimestamp(alert['end']).strftime('%d-%m-%Y %H:%M')}")
+    else:
+        st.write("Sem alertas meteorológicos no momento.")
+
+# Função para exibir índice UV
+def display_uv_index(lat, lon):
+    uv_data = get_uv_index(lat, lon)
+    if uv_data:
+        return uv_data['value']
+    else:
+        return None
+
+# Função para criar a dashboard
 def create_dashboard():
     st.title('Dashboard de Saúde e Clima')
 
@@ -80,10 +130,6 @@ def create_dashboard():
     country = st.text_input("Digite o código do país (ex: br, us, ca)", "br")
     
     if city and country:
-        # Armazenar a cidade e país em session_state
-        st.session_state['city'] = city
-        st.session_state['country'] = country
-
         # Remover espaços extras e capitalizar o nome da cidade
         city = city.strip().title()
         country = country.strip().lower()
