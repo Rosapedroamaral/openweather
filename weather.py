@@ -1,5 +1,5 @@
 import streamlit as st
-from pages import other_page
+from pages import page2
 import requests
 import pandas as pd
 import altair as alt
