@@ -10,6 +10,7 @@ BASE_URL_WEATHER = "https://api.openweathermap.org/data/2.5/weather"
 BASE_URL_FORECAST = "https://api.openweathermap.org/data/2.5/forecast"
 BASE_URL_AIR_QUALITY = "https://api.openweathermap.org/data/2.5/air_pollution"
 BASE_URL_ALERTS = "https://api.openweathermap.org/data/2.5/onecall"
+BASE_URL_UV = "https://api.openweathermap.org/data/2.5/uvi"
 
 # Níveis recomendados de poluentes (valores fictícios para exemplo)
 RECOMMENDED_LEVELS = {
@@ -66,6 +67,16 @@ def get_alerts(lat, lon):
     response = requests.get(BASE_URL_ALERTS, params=params)
     return response.json()
 
+# Função para obter índice UV
+def get_uv_index(lat, lon):
+    params = {
+        'lat': lat,
+        'lon': lon,
+        'appid': API_KEY
+    }
+    response = requests.get(BASE_URL_UV, params=params)
+    return response.json()
+
 # Função para exibir a previsão do tempo
 def display_forecast(city, country, date):
     forecast_data = get_forecast_data(city, country)
@@ -101,6 +112,13 @@ def display_alerts(lat, lon):
             st.write(f"Término: {datetime.fromtimestamp(alert['end']).strftime('%d-%m-%Y %H:%M')}")
     else:
         st.write("Sem alertas meteorológicos no momento.")
+
+# Função para exibir índice UV
+def display_uv_index(lat, lon):
+    uv_data = get_uv_index(lat, lon)
+    if uv_data:
+        uv_index = uv_data['value']
+        st.write(f"**Índice UV**: {uv_index}")
 
 # Função para criar a dashboard
 def create_dashboard():
@@ -164,6 +182,8 @@ def create_dashboard():
             display_forecast(city, country, date_str)
             # Exibir alertas meteorológicos
             display_alerts(lat, lon)
+            # Exibir índice UV
+            display_uv_index(lat, lon)
 
 if __name__ == "__main__":
     create_dashboard()
