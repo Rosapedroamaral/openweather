@@ -107,7 +107,7 @@ def create_dashboard():
                 ).properties(width=600, height=400).interactive()
                 st.altair_chart(air_quality_chart)
 
-            if weather_forecast_data:
+            if 'daily' in weather_forecast_data:
                 # Extrair dados de previsão do tempo
                 forecast_dates = []
                 forecast_temps = []
@@ -128,6 +128,8 @@ def create_dashboard():
                     tooltip=['Data', 'Temperatura (°C)']
                 ).properties(width=600, height=400).interactive()
                 st.altair_chart(weather_forecast_chart)
+            else:
+                st.warning("Dados de previsão do tempo não disponíveis.")
 
 if __name__ == "__main__":
     create_dashboard()
