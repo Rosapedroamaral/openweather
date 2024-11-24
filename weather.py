@@ -76,7 +76,7 @@ def display_forecast(city, country, date):
             st.table(forecast_df)
 
 # Função para exibir dados meteorológicos de forma estruturada
-def display_current_weather(weather_data):
+def display_current_weather(weather_data, air_quality_index):
     st.subheader(f"Condições Climáticas Atuais em {weather_data['name']}")
     col1, col2 = st.columns(2)
     
@@ -88,7 +88,7 @@ def display_current_weather(weather_data):
     with col2:
         st.write(f"**Velocidade do Vento**: {weather_data['wind']['speed']} m/s")
         st.write(f"**Descrição**: {weather_data['weather'][0]['description'].capitalize()}")
-        st.write(f"**Qualidade do Ar**: {weather_data['air_quality']}")
+        st.write(f"**Qualidade do Ar**: {air_quality_index}")
 
 # Função para criar a dashboard
 def create_dashboard():
@@ -111,12 +111,11 @@ def create_dashboard():
             lon = weather_data['coord']['lon']
             air_quality_data = get_air_quality_data(lat, lon)
             
-            # Exibir condições climáticas atuais
-            display_current_weather(weather_data)
-
             if air_quality_data:
                 air_quality_index = air_quality_data['list'][0]['main']['aqi']
-                st.write(f"**Qualidade do Ar**: {air_quality_index}")
+                
+                # Exibir condições climáticas atuais
+                display_current_weather(weather_data, air_quality_index)
                 
                 components = air_quality_data['list'][0]['components']
                 components_df = pd.DataFrame(components.items(), columns=['Componente', 'Concentração'])
