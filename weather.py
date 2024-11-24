@@ -184,8 +184,7 @@ def create_dashboard():
             display_alerts(lat, lon)
             # Exibir índice UV
             display_uv_index(lat, lon)
-            
-    # Adiciona um botão para atualização
+
 if __name__ == "__main__":
     create_dashboard()
 
