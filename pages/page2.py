@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
-from datetime import datetime, timedelta
+from datetime import datetime
 
 def load_data(start_date, end_date):
     # Exemplo de dados de temperatura máxima diária ao meio-dia no intervalo fornecido
@@ -24,30 +24,31 @@ def main():
     if start_date > end_date:
         st.error("A data inicial não pode ser posterior à data final.")
     else:
-        # Carregar dados
-        df = load_data(start_date, end_date)
+        if st.button("Atualizar Gráfico"):
+            # Carregar dados
+            df = load_data(start_date, end_date)
 
-        # Exibir tabela de dados
-        st.write(df)
+            # Exibir tabela de dados
+            st.write(df)
 
-        # Criar gráfico interativo
-        chart = alt.Chart(df).mark_line().encode(
-            x='Data',
-            y='Temperatura Máxima ao Meio-Dia (°C)',
-            tooltip=['Data', 'Temperatura Máxima ao Meio-Dia (°C)']
-        ).properties(
-            width=800,
-            height=400
-        ).interactive()
+            # Criar gráfico interativo
+            chart = alt.Chart(df).mark_line().encode(
+                x='Data',
+                y='Temperatura Máxima ao Meio-Dia (°C)',
+                tooltip=['Data', 'Temperatura Máxima ao Meio-Dia (°C)']
+            ).properties(
+                width=800,
+                height=400
+            ).interactive()
 
-        st.altair_chart(chart)
+            st.altair_chart(chart)
 
-        # Informações adicionais
-        st.subheader('Informações Adicionais')
-        st.write("""
-            Este gráfico mostra a temperatura máxima diária ao meio-dia ao longo do intervalo selecionado.
-            Você pode interagir com o gráfico para ver detalhes específicos de cada dia.
-        """)
+            # Informações adicionais
+            st.subheader('Informações Adicionais')
+            st.write("""
+                Este gráfico mostra a temperatura máxima diária ao meio-dia ao longo do intervalo selecionado.
+                Você pode interagir com o gráfico para ver detalhes específicos de cada dia.
+            """)
 
 if __name__ == "__main__":
     main()
