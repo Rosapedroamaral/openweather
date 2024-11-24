@@ -1,14 +1,14 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
-from datetime import datetime
+from datetime import datetime, timedelta
 
 def load_data(start_date, end_date):
-    # Exemplo de dados de temperatura máxima diária no intervalo fornecido
+    # Exemplo de dados de temperatura máxima diária ao meio-dia no intervalo fornecido
     date_range = pd.date_range(start=start_date, end=end_date)
     data = {
         'Data': date_range,
-        'Temperatura Máxima (°C)': [20 + (i % 10) for i in range(len(date_range))]  # Dados fictícios
+        'Temperatura Máxima ao Meio-Dia (°C)': [20 + (i % 10) for i in range(len(date_range))]  # Dados fictícios
     }
     df = pd.DataFrame(data)
     return df
@@ -33,8 +33,8 @@ def main():
         # Criar gráfico interativo
         chart = alt.Chart(df).mark_line().encode(
             x='Data',
-            y='Temperatura Máxima (°C)',
-            tooltip=['Data', 'Temperatura Máxima (°C)']
+            y='Temperatura Máxima ao Meio-Dia (°C)',
+            tooltip=['Data', 'Temperatura Máxima ao Meio-Dia (°C)']
         ).properties(
             width=800,
             height=400
@@ -45,7 +45,7 @@ def main():
         # Informações adicionais
         st.subheader('Informações Adicionais')
         st.write("""
-            Este gráfico mostra a temperatura máxima diária ao longo do intervalo selecionado.
+            Este gráfico mostra a temperatura máxima diária ao meio-dia ao longo do intervalo selecionado.
             Você pode interagir com o gráfico para ver detalhes específicos de cada dia.
         """)
 
