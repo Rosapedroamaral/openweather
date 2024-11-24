@@ -144,15 +144,21 @@ def create_dashboard():
             uv_index = display_uv_index(lat, lon)
             
             st.subheader(f"**Clima Atual em {weather_data['name']}**")
-            st.write(f"""
-                **Temperatura**: {weather_data['main']['temp']} °C  
-                **Umidade**: {weather_data['main']['humidity']}%  
-                **Pressão**: {weather_data['main']['pressure']} hPa  
-                **Velocidade do Vento**: {weather_data['wind']['speed']} m/s  
-                **Descrição**: {weather_data['weather'][0]['description'].capitalize()}  
-                **Índice UV**: {uv_index}  
-                **Qualidade do Ar**: {air_quality_data['list'][0]['main']['aqi'] if air_quality_data else 'N/A'}
-            """)
+            st.markdown(
+                f"""
+                <div style="background-color: lightblue; padding: 10px; border-radius: 10px;">
+                    <h3 style="color: darkblue;">Cidade: {weather_data['name']}</h3>
+                    <p><strong>Temperatura:</strong> {weather_data['main']['temp']} °C</p>
+                    <p><strong>Umidade:</strong> {weather_data['main']['humidity']}%</p>
+                    <p><strong>Pressão:</strong> {weather_data['main']['pressure']} hPa</p>
+                    <p><strong>Velocidade do Vento:</strong> {weather_data['wind']['speed']} m/s</p>
+                    <p><strong>Descrição:</strong> {weather_data['weather'][0]['description'].capitalize()}</p>
+                    <p><strong>Índice UV:</strong> {uv_index}</p>
+                    <p><strong>Qualidade do Ar:</strong> {air_quality_data['list'][0]['main']['aqi'] if air_quality_data else 'N/A'}</p>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
             
             if air_quality_data:
                 components = air_quality_data['list'][0]['components']
