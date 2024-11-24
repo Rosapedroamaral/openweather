@@ -130,6 +130,8 @@ def create_dashboard():
                 st.altair_chart(weather_forecast_chart)
             else:
                 st.warning("Dados de previsão do tempo não disponíveis.")
+                # Exibir a resposta completa da API para depuração
+                st.json(weather_forecast_data)
 
 if __name__ == "__main__":
     create_dashboard()
