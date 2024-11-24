@@ -78,11 +78,17 @@ def display_forecast(city, country, date):
 # Função para exibir dados meteorológicos de forma estruturada
 def display_current_weather(weather_data):
     st.subheader(f"Condições Climáticas Atuais em {weather_data['name']}")
-    st.write(f"**Temperatura**: {weather_data['main']['temp']} °C")
-    st.write(f"**Umidade**: {weather_data['main']['humidity']}%")
-    st.write(f"**Pressão**: {weather_data['main']['pressure']} hPa")
-    st.write(f"**Velocidade do Vento**: {weather_data['wind']['speed']} m/s")
-    st.write(f"**Descrição**: {weather_data['weather'][0]['description'].capitalize()}")
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.write(f"**Temperatura**: {weather_data['main']['temp']} °C")
+        st.write(f"**Umidade**: {weather_data['main']['humidity']}%")
+        st.write(f"**Pressão**: {weather_data['main']['pressure']} hPa")
+    
+    with col2:
+        st.write(f"**Velocidade do Vento**: {weather_data['wind']['speed']} m/s")
+        st.write(f"**Descrição**: {weather_data['weather'][0]['description'].capitalize()}")
+        st.write(f"**Qualidade do Ar**: {weather_data['air_quality']}")
 
 # Função para criar a dashboard
 def create_dashboard():
