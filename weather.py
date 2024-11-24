@@ -1,5 +1,5 @@
 import streamlit as st
-from pages import other_page
+from pages import page2
 import requests
 import pandas as pd
 import altair as alt
@@ -179,12 +179,12 @@ def main_dashboard():
 
 def main():
     st.sidebar.title('Menu')
-    selection = st.sidebar.radio('Navegação', ['Dashboard', 'Outra Página'])
+    selection = st.sidebar.radio('Navegação', ['Dashboard', 'Page 2'])
 
     if selection == 'Dashboard':
         main_dashboard()
-    elif selection == 'Outra Página':
-        other_page.main()
+    elif selection == 'Page 2':
+        page2.main()
 
 if __name__ == "__main__":
     main()
