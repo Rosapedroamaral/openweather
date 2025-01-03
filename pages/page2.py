@@ -42,7 +42,7 @@ def show_historical_analysis():
     
     if city and country:
         city = city.strip().title()
-        country = country.strip()..lower()
+        country = country.strip().lower()  
         weather_data = get_weather_data(city, country)
         
         if weather_data.get("cod") != 200:
