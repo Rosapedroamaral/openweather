@@ -20,7 +20,6 @@ def get_forecast_data(city, country):
 
 # Função para exibir a análise de previsão
 def display_forecast_analysis(city, country):
-    st.title("Análise de Tendências de Previsão")
 
     forecast_data = get_forecast_data(city, country)
     if forecast_data.get("cod") != "200":
@@ -60,8 +59,6 @@ def display_forecast_analysis(city, country):
         st.altair_chart(line_chart)
 
 def main():
-    st.title('Análise de Tendências de Previsão')
-
     city = st.text_input("Digite o nome da cidade", "Rio de Janeiro")
     country = st.text_input("Digite o código do país (ex: br, us, ca)", "br")
 
