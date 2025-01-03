@@ -38,13 +38,13 @@ def display_forecast_analysis(city, country):
         forecast_df['Data'] = pd.to_datetime(forecast_df['Data'])
         
         line_chart = alt.Chart(forecast_df).mark_line(color='blue').encode(
-            x=alt.X('Data:T', title='Data'),
-            y=alt.Y('Temperatura (°C):Q', title='Temperatura (°C)'),
-            tooltip=['Data', 'Temperatura (°C)', 'Descrição']
+            x=alt.X('Data:T', title='Data', axis=alt.Axis(format='%d-%m-%Y')),
+            y=alt.Y('Temperatura (°C):Q', title='Temperatura (°C)', sort='ascending'),
+            tooltip=['Data:T', 'Temperatura (°C):Q', 'Descrição:N']
         ).properties(
             width=800,
             height=400,
-            title="Tendência de Temperatura"
+            title="Gráfico de Tendência de Previsão"
         ).configure_title(
             fontSize=20,
             font='Arial',
@@ -60,7 +60,7 @@ def display_forecast_analysis(city, country):
         st.altair_chart(line_chart)
 
 def main():
-    st.title('Page 2')
+    st.title('Análise de Tendências de Previsão')
 
     city = st.text_input("Digite o nome da cidade", "Rio de Janeiro")
     country = st.text_input("Digite o código do país (ex: br, us, ca)", "br")
