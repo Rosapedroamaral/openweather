@@ -38,7 +38,11 @@ def display_forecast_analysis(city, country):
         forecast_df['Data'] = pd.to_datetime(forecast_df['Data'])
 
         # Ordenar os dados pela coluna 'Data' para garantir a sequência correta
-        forecast_df = forecast_df.sort_values(by='Data')
+        forecast_df.sort_values(by='Data', inplace=True)
+
+        # Verificar se os dados estão na ordem correta
+        st.write("Dados Ordenados:")
+        st.write(forecast_df)
 
         st.line_chart(forecast_df.set_index('Data'))
 
