@@ -154,10 +154,6 @@ def create_dashboard():
             lon = weather_data['coord']['lon']
             air_quality_data = get_air_quality_data(lat, lon)
             uv_index = display_uv_index(lat, lon)
-
-            # Exibir imagem com base no clima
-            weather_description = weather_data['weather'][0]['description'].lower()
-            display_climate_image(weather_description)
             
             st.subheader(f"**Dados do clima atual para {city}**")
             col1, col2 = st.columns(2)
@@ -199,6 +195,10 @@ def create_dashboard():
                     tooltip=['Componente', 'Concentração']
                 ).properties(width=600, height=400).interactive()
                 st.altair_chart(air_quality_chart)
+            
+            # Exibir imagem com base no clima
+            weather_description = weather_data['weather'][0]['description'].lower()
+            display_climate_image(weather_description)
             
             # Adicionar seleção de data
             date = st.date_input("Selecione uma data para a previsão", datetime.today())
