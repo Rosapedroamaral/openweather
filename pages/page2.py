@@ -35,8 +35,35 @@ def display_forecast_analysis(city, country):
             })
 
         forecast_df = pd.DataFrame(forecast_list)
+        forecast_df['Data'] = pd.to_datetime(forecast_df['Data'])
+        
+        line_chart = alt.Chart(forecast_df).mark_line(color='blue').encode(
+            x=alt.X('Data:T', title='Data'),
+            y=alt.Y('Temperatura (°C):Q', title='Temperatura (°C)'),
+            tooltip=['Data', 'Temperatura (°C)', 'Descrição']
+        ).properties(
+            width=800,
+            height=400,
+            title="Tendência de Temperatura"
+        ).configure_title(
+            fontSize=20,
+            font='Arial',
+            anchor='start',
+            color='black'
+        ).configure_axis(
+            labelFontSize=12,
+            titleFontSize=14,
+            labelColor='grey',
+            titleColor='grey'
+        ).configure_tooltip(
+            background='white',
+            borderColor='grey',
+            borderWidth=1,
+            cornerRadius=5,
+            fontSize=12
+        ).interactive()
 
-        st.line_chart(forecast_df.set_index('Data'))
+        st.altair_chart(line_chart)
 
 def main():
     st.title('Page 2')
