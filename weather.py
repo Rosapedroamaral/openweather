@@ -123,7 +123,7 @@ def display_uv_index(lat, lon):
 
 # Função para criar a dashboard
 def create_dashboard():
-    st.title('Dashboard de Saúde e Clima')
+    st.title('Dados de Saúde e Clima')
 
     # Adicionar entrada para cidade e país
     city = st.text_input("Digite o nome da cidade", "Rio de Janeiro")
