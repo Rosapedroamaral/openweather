@@ -64,16 +64,8 @@ def show_historical_analysis():
                     st.line_chart(historical_df.set_index('Data'))
 
 def main():
-    st.sidebar.title("Navegação")
-    selection = st.sidebar.selectbox("Escolha uma página", ["Dashboard Principal", "Page 2", "Análise Histórica"])
-
-    if selection == "Dashboard Principal":
-        create_dashboard()
-    elif selection == "Page 2":
-        st.title('Page 2')
-        st.write('Conteúdo da page 2.')
-    elif selection == "Análise Histórica":
-        show_historical_analysis()
+    st.title('Page 2')
+    show_historical_analysis()
 
 if __name__ == "__main__":
     main()
