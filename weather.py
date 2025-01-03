@@ -146,10 +146,6 @@ def create_dashboard():
         city = city.strip().title()
         country = country.strip().lower()
         weather_data = get_weather_data(city, country)
-
-        # Exibir imagem com base no clima
-        weather_description = weather_data['weather'][0]['description'].lower()
-        display_climate_image(weather_description)
         
         if weather_data.get("cod") != 200:
             st.error(f"Cidade '{city}' não encontrada no país '{country.upper()}'. Tente outra cidade ou país.")
@@ -158,7 +154,7 @@ def create_dashboard():
             lon = weather_data['coord']['lon']
             air_quality_data = get_air_quality_data(lat, lon)
             uv_index = display_uv_index(lat, lon)
-            
+
             st.subheader(f"**Dados do clima atual para {city}**")
             col1, col2 = st.columns(2)
 
@@ -168,7 +164,7 @@ def create_dashboard():
                 st.write(f"**Pressão:** {weather_data['main']['pressure']} hPa")
                 st.write(f"**Velocidade do Vento:** {weather_data['wind']['speed']} m/s")
             with col2:
-                st.write(f"**Descrição:** {weather_description.capitalize()}")
+                st.write(f"**Descrição:** {weather_data['weather'][0]['description'].capitalize()}")
                 st.write(f"**Índice UV:** {uv_index}")
                 if uv_index and uv_index > 11:
                     st.warning("**Índice UV está extremamente alto! Proteja-se do sol.**")
@@ -199,7 +195,10 @@ def create_dashboard():
                     tooltip=['Componente', 'Concentração']
                 ).properties(width=600, height=400).interactive()
                 st.altair_chart(air_quality_chart)
-            
+
+            # Obter a descrição do clima atual
+            weather_description = weather_data['weather'][0]['description'].lower()
+
             # Adicionar seleção de data
             date = st.date_input("Selecione uma data para a previsão", datetime.today())
             date_str = date.strftime("%Y-%m-%d")
@@ -208,6 +207,10 @@ def create_dashboard():
             display_forecast(city, country, date_str)
             # Exibir alertas meteorológicos
             display_alerts(lat, lon)
+
+            # Exibir imagem com base no clima
+            display_climate_image(weather_description)
+
 
 if __name__ == "__main__":
     create_dashboard()
