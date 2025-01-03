@@ -121,9 +121,21 @@ def display_uv_index(lat, lon):
     else:
         return None
 
+# Função para exibir imagem com base no clima
+def display_climate_image(weather_description):
+    st.header("Aproveite o clima")
+    if 'nublado' in weather_description:
+        st.image('robo_nublado.png')
+    elif 'sol' in weather_description:
+        st.image('robo_sol.png')
+    elif 'chuva' in weather_description:
+        st.image('robo_chuva.png')
+    elif 'neve' in weather_description:
+        st.image('robo_neve.png')
+
 # Função para criar a dashboard
 def create_dashboard():
-    st.title('Dados de Saúde e Clima')
+    st.title('Dashboard de Saúde e Clima')
 
     # Adicionar entrada para cidade e país
     city = st.text_input("Digite o nome da cidade", "Rio de Janeiro")
@@ -142,6 +154,10 @@ def create_dashboard():
             lon = weather_data['coord']['lon']
             air_quality_data = get_air_quality_data(lat, lon)
             uv_index = display_uv_index(lat, lon)
+
+            # Exibir imagem com base no clima
+            weather_description = weather_data['weather'][0]['description'].lower()
+            display_climate_image(weather_description)
             
             st.subheader(f"**Dados do clima atual para {city}**")
             col1, col2 = st.columns(2)
@@ -152,7 +168,7 @@ def create_dashboard():
                 st.write(f"**Pressão:** {weather_data['main']['pressure']} hPa")
                 st.write(f"**Velocidade do Vento:** {weather_data['wind']['speed']} m/s")
             with col2:
-                st.write(f"**Descrição:** {weather_data['weather'][0]['description'].capitalize()}")
+                st.write(f"**Descrição:** {weather_description.capitalize()}")
                 st.write(f"**Índice UV:** {uv_index}")
                 if uv_index and uv_index > 11:
                     st.warning("**Índice UV está extremamente alto! Proteja-se do sol.**")
