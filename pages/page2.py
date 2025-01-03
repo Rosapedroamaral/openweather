@@ -28,37 +28,15 @@ def display_forecast_analysis(city, country):
     else:
         forecast_list = []
         for day in forecast_data['list']:
-            if day['dt_txt'].endswith("12:00:00"):
-                forecast_list.append({
-                    'Data': day['dt_txt'].split(" ")[0],
-                    'Temperatura (°C)': day['main']['temp'],
-                    'Descrição': day['weather'][0]['description'].capitalize()
-                })
+            forecast_list.append({
+                'Data': day['dt_txt'],
+                'Temperatura (°C)': day['main']['temp'],
+                'Descrição': day['weather'][0]['description'].capitalize()
+            })
 
         forecast_df = pd.DataFrame(forecast_list)
-        forecast_df['Data'] = pd.to_datetime(forecast_df['Data'])
-        
-        line_chart = alt.Chart(forecast_df).mark_line(color='blue').encode(
-            x=alt.X('Data:T', title='Data', axis=alt.Axis(format='%d-%m-%Y')),
-            y=alt.Y('Temperatura (°C):Q', title='Temperatura (°C)'),
-            tooltip=['Data', 'Temperatura (°C)', 'Descrição']
-        ).properties(
-            width=800,
-            height=400,
-            title="Tendência de Temperatura"
-        ).configure_title(
-            fontSize=20,
-            font='Arial',
-            anchor='start',
-            color='black'
-        ).configure_axis(
-            labelFontSize=12,
-            titleFontSize=14,
-            labelColor='grey',
-            titleColor='grey'
-        ).interactive()
 
-        st.altair_chart(line_chart)
+        st.line_chart(forecast_df.set_index('Data'))
 
 def main():
     st.title('Page 2')
