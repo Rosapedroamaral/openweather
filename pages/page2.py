@@ -55,12 +55,6 @@ def display_forecast_analysis(city, country):
             titleFontSize=14,
             labelColor='grey',
             titleColor='grey'
-        ).configure_tooltip(
-            background='white',
-            borderColor='grey',
-            borderWidth=1,
-            cornerRadius=5,
-            fontSize=12
         ).interactive()
 
         st.altair_chart(line_chart)
