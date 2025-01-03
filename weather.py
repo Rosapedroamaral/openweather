@@ -124,7 +124,7 @@ def display_uv_index(lat, lon):
 # Função para exibir imagem com base no clima
 def display_climate_image(weather_description):
     st.header("Aproveite o clima")
-    if 'nublado' in weather_description or 'nuvens' in weather_description or 'nuvens dispersas' in weather_description or 'nublado' in weather_description:
+    if 'nublado' in weather_description or 'névoa' in weather_description or 'nuvens' in weather_description or 'nuvens dispersas' in weather_description or 'nublado' in weather_description:
         st.image('robo_nublado.png')
     elif 'sol' in weather_description or 'céu claro' in weather_description or 'céu limpo' in weather_description or 'ensolarado' in weather_description:
         st.image('robo_sol.png')
