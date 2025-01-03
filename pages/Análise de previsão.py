@@ -59,7 +59,7 @@ def display_forecast_analysis(city, country):
         st.altair_chart(line_chart)
 
 def main():
-    st.title('Analise de tendencia de previsão')
+    st.title('Análise de Tendência de Previsão')
     city = st.text_input("Digite o nome da cidade", "Rio de Janeiro")
     country = st.text_input("Digite o código do país (ex: br, us, ca)", "br")
 
