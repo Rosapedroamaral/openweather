@@ -27,13 +27,16 @@ def display_forecast_analysis(city, country):
         st.error("Erro ao obter dados de previsão do tempo.")
     else:
         forecast_list = []
+        seen_dates = set()
         for day in forecast_data['list']:
-            if day['dt_txt'].endswith("12:00:00"):
+            date = day['dt_txt'].split(" ")[0]
+            if date not in seen_dates and day['dt_txt'].endswith("12:00:00"):
                 forecast_list.append({
-                    'Data': day['dt_txt'].split(" ")[0],
+                    'Data': date,
                     'Temperatura (°C)': day['main']['temp'],
                     'Descrição': day['weather'][0]['description'].capitalize()
                 })
+                seen_dates.add(date)
 
         forecast_df = pd.DataFrame(forecast_list)
         forecast_df['Data'] = pd.to_datetime(forecast_df['Data'])
