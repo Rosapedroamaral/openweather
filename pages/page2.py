@@ -36,10 +36,10 @@ def display_forecast_analysis(city, country):
 
         forecast_df = pd.DataFrame(forecast_list)
         forecast_df['Data'] = pd.to_datetime(forecast_df['Data'])
-        
+
         line_chart = alt.Chart(forecast_df).mark_line(color='blue').encode(
             x=alt.X('Data:T', title='Data', axis=alt.Axis(format='%d-%m-%Y')),
-            y=alt.Y('Temperatura (°C):Q', title='Temperatura (°C)', sort='ascending'),
+            y=alt.Y('Temperatura (°C):Q', title='Temperatura (°C)'),
             tooltip=['Data:T', 'Temperatura (°C):Q', 'Descrição:N']
         ).properties(
             width=800,
@@ -49,7 +49,7 @@ def display_forecast_analysis(city, country):
             fontSize=20,
             font='Arial',
             anchor='start',
-            color='black'
+            color='blue'  # Título em azul
         ).configure_axis(
             labelFontSize=12,
             titleFontSize=14,
