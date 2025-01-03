@@ -6,7 +6,19 @@ from datetime import datetime, timedelta
 
 # Configurações da API do OpenWeather
 API_KEY = st.secrets["API_KEY"]
+BASE_URL_WEATHER = "https://api.openweathermap.org/data/2.5/weather"
 BASE_URL_HISTORICAL = "https://api.openweathermap.org/data/2.5/onecall/timemachine"
+
+# Função para obter dados meteorológicos
+def get_weather_data(city, country):
+    params = {
+        'q': f"{city},{country}",
+        'appid': API_KEY,
+        'units': 'metric',
+        'lang': 'pt_br'
+    }
+    response = requests.get(BASE_URL_WEATHER, params=params)
+    return response.json()
 
 # Função para obter dados históricos
 def get_historical_data(lat, lon, date):
@@ -30,7 +42,7 @@ def show_historical_analysis():
     
     if city and country:
         city = city.strip().title()
-        country = country.strip().lower()
+        country = country.strip()..lower()
         weather_data = get_weather_data(city, country)
         
         if weather_data.get("cod") != 200:
