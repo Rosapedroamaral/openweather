@@ -42,8 +42,9 @@ def show_historical_analysis():
     
     if city and country:
         city = city.strip().title()
-        country = country.strip().lower()  
+        country = country.strip().lower()
         weather_data = get_weather_data(city, country)
+        st.write("Dados Meteorológicos:", weather_data)  # Adiciona mensagem de depuração
         
         if weather_data.get("cod") != 200:
             st.error(f"Cidade '{city}' não encontrada no país '{country.upper()}'. Tente outra cidade ou país.")
@@ -62,6 +63,7 @@ def show_historical_analysis():
                 # Obtenção de dados históricos para o intervalo de datas
                 for date in date_range:
                     data = get_historical_data(lat, lon, date.strftime("%Y-%m-%d"))
+                    st.write(f"Dados Históricos para {date.strftime('%Y-%m-%d')}: ", data)  # Adiciona mensagem de depuração
                     if 'current' in data:
                         historical_data.append({
                             'Data': date.strftime("%Y-%m-%d"),
@@ -71,7 +73,6 @@ def show_historical_analysis():
 
                 if historical_data:
                     historical_df = pd.DataFrame(historical_data)
-                    
                     st.subheader(f"Dados Históricos de {city}")
                     st.line_chart(historical_df.set_index('Data'))
 
