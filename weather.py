@@ -146,6 +146,10 @@ def create_dashboard():
         city = city.strip().title()
         country = country.strip().lower()
         weather_data = get_weather_data(city, country)
+
+        # Exibir imagem com base no clima
+        weather_description = weather_data['weather'][0]['description'].lower()
+        display_climate_image(weather_description)
         
         if weather_data.get("cod") != 200:
             st.error(f"Cidade '{city}' não encontrada no país '{country.upper()}'. Tente outra cidade ou país.")
@@ -195,10 +199,6 @@ def create_dashboard():
                     tooltip=['Componente', 'Concentração']
                 ).properties(width=600, height=400).interactive()
                 st.altair_chart(air_quality_chart)
-            
-            # Exibir imagem com base no clima
-            weather_description = weather_data['weather'][0]['description'].lower()
-            display_climate_image(weather_description)
             
             # Adicionar seleção de data
             date = st.date_input("Selecione uma data para a previsão", datetime.today())
